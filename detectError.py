@@ -1,31 +1,26 @@
+import pandas as pd
+
 # MISSING ACTIVITIES
-    # Se non contiene N,A,R o C --> errore è missing N/A/R/C
-    # L'errore è la mancanza di un'attività nel posto giusto
+    # CHeck if any of the activity N,A,R,C is missing
+    # Error description: an activity is missing in the right step of the process
+    # Output: Dict of boolean
 def detectMissingInTrace(trace):
-    counter = [0,0,0,0] #N,A,R,C
+    missingDict = {"N":True,"A":True,"R":True,"C":True}
 
-    for elem in trace:
-        if "S" in elem and "NEW" in elem:
-            counter[0] = 1
-        elif "S" in elem and "ACTIVE" in elem:
-            counter[1] = 1
-        elif "S" in elem and "RESOLVED" in elem:
-            counter[2] = 1
-        elif "S" in elem and "CLOSED" in elem:
-            counter[3] = 1
-    missingDict = {"N":False,"A":False,"R":False,"C":False}
-    if counter[0] == 0:
-        missingDict["N"] = True
-    if counter[1] == 0:
-        missingDict["A"] = True
-    if counter[2] == 0:
-        missingDict["R"] = True
-    if counter[3] == 0:
-        missingDict["C"] = True
+    for activity in trace:
+        if "S" in activity and "NEW" in activity:
+            missingDict["N"] = False
+        elif "S" in activity and ("ACTIVE" in activity or "priority" in activity or "classification" in activity):
+            missingDict["A"] = False
+        elif "S" in activity and "RESOLVED" in activity:
+            missingDict["R"] = False
+        elif "S" in activity and "CLOSED" in activity:
+            missingDict["C"] = False
 
-    print("Missing activities")
-    print(missingDict)
-    return missingDict
+    # print("Missing activities")
+    dfMissing = pd.DataFrame.from_dict(missingDict, orient='index').transpose().rename(columns={"N": "missingN", "A": "missingA", "R": "missingR", "C": "missingC"})
+    # print(dfMissing)
+    return dfMissing
 
 
 def areSame(str1,str2):
@@ -43,33 +38,35 @@ def areSame(str1,str2):
     
 
 # MULTIPLE ACTIVITIES
-    #Si valuta quante volte consecutive è ripetuto ogni attività
+    # Check how many times activities are repeated in the trace
+    # Error description: an activity is repeated multiple times
+    # Output: Dict of array of int
 def detectMultipleInTrace(trace):
+    multipleDic = {"N":[],"A":[],"W":[],"R":[],"C":[]}
     counterN=0
     counterA=0
     counterW=0
     counterR=0
     counterC=0
-
     cntN=[]
     cntA=[]
     cntW=[]
     cntR=[]
     cntC=[]
 
-    oldElem = trace[0]
+    prevActivity = trace[0]
     for i in range(1,len(trace)-1):
-        elem = trace[i]
-        if areSame(oldElem.lower(),elem.lower()):
-            if "new" in elem.lower():
+        currActivity = trace[i]
+        if areSame(prevActivity.lower(),currActivity.lower()):
+            if "new" in currActivity.lower():
                 counterN +=1
-            elif"active" in elem.lower():
+            elif"active" in currActivity.lower():
                 counterA +=1
-            elif "resolved" in elem.lower():
+            elif "resolved" in currActivity.lower():
                 counterR += 1
-            elif "closed" in elem.lower():
+            elif "closed" in currActivity.lower():
                 counterC += 1
-            elif "awaiting" in elem.lower():
+            elif "awaiting" in currActivity.lower():
                 counterW +=1
         else:
             cntN.append(counterN)
@@ -82,40 +79,49 @@ def detectMultipleInTrace(trace):
             counterW=0
             counterR=0
             counterC=0
-        oldElem = elem
-
-    multipleDic = {"N":[],"A":[],"W":[],"R":[],"C":[]}
+        prevActivity = currActivity
 
     cntN = [i for i in cntN if i != 0]
-    multipleDic["N"] = cntN
-
     cntA = [i for i in cntA if i != 0]
-    multipleDic["A"] = cntA
-
     cntW = [i for i in cntW if i != 0]
-    multipleDic["W"] = cntW
-
     cntR = [i for i in cntR if i != 0]
-    multipleDic["R"] = cntR
-
     cntC = [i for i in cntC if i != 0]
-    multipleDic["C"] = cntC
+    multipleDic["N"] = ''.join(str(e) for e in cntN).replace(" ",";")
+    multipleDic["A"] = ''.join(str(e) for e in cntA).replace(" ",";")
+    multipleDic["W"] = ''.join(str(e) for e in cntW).replace(" ",";")
+    multipleDic["R"] = ''.join(str(e) for e in cntR).replace(" ",";")
+    multipleDic["C"] = ''.join(str(e) for e in cntC).replace(" ",";")
 
-    print("Multiple activities")
-    print(multipleDic)
-    return multipleDic
+    # multipleDic["N"] = cntN
+    # multipleDic["A"] = cntA
+    # multipleDic["W"] = cntW
+    # multipleDic["R"] = cntR
+    # multipleDic["C"] = cntC
+
+    # print("Multiple activities")
+    dfMultiple = pd.DataFrame.from_dict(multipleDic, orient='index').transpose().rename(columns={"N": "multipleN", "A": "multipleA", "W": "multipleW", "R": "multipleR", "C": "multipleC"}).replace(r'^\s*$', 0, regex=True)
+    # print(dfMultiple)
+    return dfMultiple
 
 # MISMATCHING ORDER
-    # Si valuta quando RESOLVED non è seguito da RESOLVED/CLOSED
+    # Check how many times the incident has been reopened (e.g., Resolved followed by new,active or awating activity)
+    # Output: int
 def detectMismatchingInTrace(trace):
-    counter = 0
-    oldElem = trace[0]
+    mismatchDic = {"N":0,"R":0}
+    cntN = cntR = 0
+    prevActivity = trace[0]
     for i in range(1,len(trace)-1):
-        elem = trace[i]
-        if "resolved" in oldElem.lower() and not ("resolved" in elem.lower() or "closed" in elem.lower()):
-            counter +=1
-        oldElem = elem
+        currActivity = trace[i]
+        if "resolved" in prevActivity.lower() and not ("resolved" in currActivity.lower() or "closed" in currActivity.lower()):
+            cntR +=1
+        if "new" not in prevActivity.lower() and "new" in currActivity.lower():
+            cntN +=1
+        prevActivity = currActivity
+    
+    mismatchDic["N"] = cntN
+    mismatchDic["R"] = cntR
 
-    print("Mismarching order")
-    print(counter)
-    return counter
+    # print("Mismarching order")
+    dfMismatch = pd.DataFrame.from_dict(mismatchDic, orient='index').transpose().rename(columns={"N": "mismatchN", "R": "mismatchR"})
+    # print(dfMismatch)
+    return dfMismatch
