@@ -1,7 +1,7 @@
 import pandas as pd
 import detectError
 import categorizeIncidents
-import ast
+import costModel
 
 # Format of matching:
 # L: log move (L)
@@ -20,12 +20,20 @@ if __name__ == '__main__':
 
     for i in range(0,len(matchList)-1):
         trace = format_trace(matchList[i])
+        numEv = len(trace)
         dfMiss = detectError.detectMissingInTrace(trace)
         dfMult = detectError.detectMultipleInTrace(trace)
         dfMism = detectError.detectMismatchingInTrace(trace)
 
+        costMiss = costModel.calculateMissing(dfMiss)
+        dfCostMiss = pd.DataFrame.from_dict(costMiss, orient='index').transpose()
+        costMult = costModel.calculateMultiple(dfMult, numEv)
+        dfCostMult = pd.DataFrame.from_dict(costMult, orient='index').transpose()
+        costMism = costModel.calculateMismatch(dfMism, numEv)
+        dfCostMism = pd.DataFrame.from_dict(costMism, orient='index').transpose()
+        
         filterCheck = pd.DataFrame.from_dict(dfChecking.iloc[i].to_dict(), orient='index').transpose()
-        errors = pd.concat([filterCheck, dfMiss, dfMult, dfMism], axis=1)
+        errors = pd.concat([filterCheck, dfMiss, dfMult, dfMism, dfCostMiss, dfCostMult, dfCostMism], axis=1)
 
         categories = categorizeIncidents.classifyInc(dfIncident,format_trace(incList[i]))
         dfCategories = pd.DataFrame.from_dict({"Categories": str(categories)}, orient='index').transpose()
@@ -33,8 +41,7 @@ if __name__ == '__main__':
         fullRow = pd.concat([errors, dfCategories], axis=1)
         dfResult = dfResult.append(fullRow)
 
-
-        if i == 3:
-            break
+        # if i == 3:
+        #     break
     # print(dfResult)
     dfResult.to_csv("result.csv")
