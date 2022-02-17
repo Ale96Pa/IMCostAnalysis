@@ -41,18 +41,17 @@ def areSame(str1,str2):
     # Check how many times activities are repeated in the trace
     # Error description: an activity is repeated multiple times
     # Output: Dict of array of int
+# MULTIPLE ACTIVITIES
+    # Check how many times activities are repeated in the trace
+    # Error description: an activity is repeated multiple times
+    # Output: Dict of array of int
 def detectMultipleInTrace(trace):
-    multipleDic = {"N":[],"A":[],"W":[],"R":[],"C":[]}
+    multipleDic = {"N":0,"A":0,"W":0,"R":0,"C":0}
     counterN=0
     counterA=0
     counterW=0
     counterR=0
     counterC=0
-    cntN=[]
-    cntA=[]
-    cntW=[]
-    cntR=[]
-    cntC=[]
 
     prevActivity = trace[0]
     for i in range(1,len(trace)-1):
@@ -68,29 +67,13 @@ def detectMultipleInTrace(trace):
                 counterC += 1
             elif "awaiting" in currActivity.lower():
                 counterW +=1
-        else:
-            cntN.append(counterN)
-            cntA.append(counterA)
-            cntW.append(counterW)
-            cntR.append(counterR)
-            cntC.append(counterC)
-            counterN=0
-            counterA=0
-            counterW=0
-            counterR=0
-            counterC=0
         prevActivity = currActivity
 
-    cntN = [i for i in cntN if i != 0]
-    cntA = [i for i in cntA if i != 0]
-    cntW = [i for i in cntW if i != 0]
-    cntR = [i for i in cntR if i != 0]
-    cntC = [i for i in cntC if i != 0]
-    multipleDic["N"] = ''.join(str(e) for e in cntN).replace(" ",";")
-    multipleDic["A"] = ''.join(str(e) for e in cntA).replace(" ",";")
-    multipleDic["W"] = ''.join(str(e) for e in cntW).replace(" ",";")
-    multipleDic["R"] = ''.join(str(e) for e in cntR).replace(" ",";")
-    multipleDic["C"] = ''.join(str(e) for e in cntC).replace(" ",";")
+    multipleDic["N"] = counterN
+    multipleDic["A"] = counterA
+    multipleDic["W"] = counterW
+    multipleDic["R"] = counterR
+    multipleDic["C"] = counterC
 
     # multipleDic["N"] = cntN
     # multipleDic["A"] = cntA
@@ -99,9 +82,71 @@ def detectMultipleInTrace(trace):
     # multipleDic["C"] = cntC
 
     # print("Multiple activities")
-    dfMultiple = pd.DataFrame.from_dict(multipleDic, orient='index').transpose().rename(columns={"N": "multipleN", "A": "multipleA", "W": "multipleW", "R": "multipleR", "C": "multipleC"}).replace(r'^\s*$', 0, regex=True)
+    dfMultiple = pd.DataFrame.from_dict(multipleDic, orient='index').transpose().rename(columns={"N": "multipleN", "A": "multipleA", "W": "multipleW", "R": "multipleR", "C": "multipleC"})
     # print(dfMultiple)
     return dfMultiple
+
+# def detectMultipleInTrace(trace):
+#     multipleDic = {"N":[],"A":[],"W":[],"R":[],"C":[]}
+#     counterN=0
+#     counterA=0
+#     counterW=0
+#     counterR=0
+#     counterC=0
+#     cntN=[]
+#     cntA=[]
+#     cntW=[]
+#     cntR=[]
+#     cntC=[]
+
+#     prevActivity = trace[0]
+#     for i in range(1,len(trace)-1):
+#         currActivity = trace[i]
+#         if areSame(prevActivity.lower(),currActivity.lower()):
+#             if "new" in currActivity.lower():
+#                 counterN +=1
+#             elif"active" in currActivity.lower():
+#                 counterA +=1
+#             elif "resolved" in currActivity.lower():
+#                 counterR += 1
+#             elif "closed" in currActivity.lower():
+#                 counterC += 1
+#             elif "awaiting" in currActivity.lower():
+#                 counterW +=1
+#         else:
+#             cntN.append(counterN)
+#             cntA.append(counterA)
+#             cntW.append(counterW)
+#             cntR.append(counterR)
+#             cntC.append(counterC)
+#             counterN=0
+#             counterA=0
+#             counterW=0
+#             counterR=0
+#             counterC=0
+#         prevActivity = currActivity
+
+#     cntN = [i for i in cntN if i != 0]
+#     cntA = [i for i in cntA if i != 0]
+#     cntW = [i for i in cntW if i != 0]
+#     cntR = [i for i in cntR if i != 0]
+#     cntC = [i for i in cntC if i != 0]
+#     multipleDic["N"] = ''.join(str(e) for e in cntN).replace(" ",";")
+#     multipleDic["A"] = ''.join(str(e) for e in cntA).replace(" ",";")
+#     multipleDic["W"] = ''.join(str(e) for e in cntW).replace(" ",";")
+#     multipleDic["R"] = ''.join(str(e) for e in cntR).replace(" ",";")
+#     multipleDic["C"] = ''.join(str(e) for e in cntC).replace(" ",";")
+
+#     # multipleDic["N"] = cntN
+#     # multipleDic["A"] = cntA
+#     # multipleDic["W"] = cntW
+#     # multipleDic["R"] = cntR
+#     # multipleDic["C"] = cntC
+
+#     # print("Multiple activities")
+#     dfMultiple = pd.DataFrame.from_dict(multipleDic, orient='index').transpose().rename(columns={"N": "multipleN", "A": "multipleA", "W": "multipleW", "R": "multipleR", "C": "multipleC"}).replace(r'^\s*$', 0, regex=True)
+#     # print(dfMultiple)
+#     return dfMultiple
 
 # MISMATCHING ORDER
     # Check how many times the incident has been reopened (e.g., Resolved followed by new,active or awating activity)

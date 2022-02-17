@@ -31,9 +31,11 @@ if __name__ == '__main__':
         dfCostMult = pd.DataFrame.from_dict(costMult, orient='index').transpose()
         costMism = costModel.calculateMismatch(dfMism, numEv)
         dfCostMism = pd.DataFrame.from_dict(costMism, orient='index').transpose()
+        costTot = costMiss["costMissing"]+costMult["costMultiple"]+costMism["costMismatch"]
+        dfCostTot = pd.DataFrame.from_dict({"cost": costTot}, orient='index').transpose()
         
         filterCheck = pd.DataFrame.from_dict(dfChecking.iloc[i].to_dict(), orient='index').transpose()
-        errors = pd.concat([filterCheck, dfMiss, dfMult, dfMism, dfCostMiss, dfCostMult, dfCostMism], axis=1)
+        errors = pd.concat([filterCheck, dfMiss, dfMult, dfMism, dfCostMiss, dfCostMult, dfCostMism, dfCostTot], axis=1)
 
         categories = categorizeIncidents.classifyInc(dfIncident,format_trace(incList[i]))
         dfCategories = pd.DataFrame.from_dict({"Categories": str(categories)}, orient='index').transpose()
