@@ -1,0 +1,2 @@
+listFit=[]
+            oldCat = currCat

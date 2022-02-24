@@ -1,5 +1,32 @@
 import pandas as pd
 
+# MISSING ACTIVITIES
+    # CHeck if any of the activity N,A,R,C is missing
+    # Error description: an activity is missing in the right step of the process
+    # Output: Dict of boolean
+def detectMissingInTrace(trace):
+    missingDict = {"N":True,"A":True,"D":True,"Y":True,"K":True,"R":True,"C":True}
+
+    for activity in trace:
+        if "S" in activity and "NEW" in activity:
+            missingDict["N"] = False
+        elif "S" in activity and ("ACTIVE" in activity or "priority" in activity or "classification" in activity):
+            missingDict["A"] = False
+        elif "S" in activity and "RESOLVED" in activity:
+            missingDict["R"] = False
+        elif "S" in activity and "CLOSED" in activity:
+            missingDict["C"] = False
+        elif "S" in activity and "DOUBLE CHECK" in activity:
+            missingDict["D"] = False
+        elif "S" in activity and "NOTIFICATION" in activity:
+            missingDict["Y"] = False
+        elif "S" in activity and "KB" in activity:
+            missingDict["K"] = False
+
+    dfMissing = pd.DataFrame.from_dict(missingDict, orient='index').transpose().rename(columns={"N": "missingN", "A": "missingA", "D": "missingD", "Y": "missingY","K": "missingK", "R": "missingR", "C": "missingC"})
+    return dfMissing
+
+
 def areSame(str1,str2):
     if "new" in str1 and "new" in str2:
         return True
@@ -13,39 +40,8 @@ def areSame(str1,str2):
         return True
     if "assign" in str1 and "assign" in str2:
         return True
-    if "double" in str1 and "double" in str2:
-        return True
-    if "notif" in str1 and "notif" in str2:
-        return True
-    if "know" in str1 and "know" in str2:
-        return True
     return False
-
-# MISSING ACTIVITIES
-    # Check if any of the activity is missing
-    # Error description: an activity is missing in the right step of the process
-    # Output: Dict of boolean
-def detectMissingInTrace(trace, isEnriched):
-    missingDict = {"N":1,"A":1,"D":int(isEnriched),"Y":int(isEnriched),"K":int(isEnriched),"R":1,"C":1}
-
-    for activity in trace:
-        if "S" in activity and "NEW" in activity:
-            missingDict["N"] = 0
-        elif "S" in activity and ("ACTIVE" in activity or "priority" in activity or "classification" in activity):
-            missingDict["A"] = 0
-        elif "S" in activity and "RESOLVED" in activity:
-            missingDict["R"] = 0
-        elif "S" in activity and "CLOSED" in activity:
-            missingDict["C"] = 0
-        elif isEnriched and "S" in activity and "DOUBLE CHECK" in activity:
-            missingDict["D"] = 0
-        elif isEnriched and "S" in activity and "NOTIFICATION" in activity:
-            missingDict["Y"] = 0
-        elif isEnriched and "S" in activity and "KB" in activity:
-            missingDict["K"] = 0
-
-    dfMissing = pd.DataFrame.from_dict(missingDict, orient='index').transpose().rename(columns={"N": "missingN", "A": "missingA", "D": "missingD", "Y": "missingY","K": "missingK", "R": "missingR", "C": "missingC"})
-    return dfMissing
+    
 
 # MULTIPLE ACTIVITIES
     # Check how many times activities are repeated in the trace
@@ -107,5 +103,7 @@ def detectMismatchingInTrace(trace):
     mismatchDic["N"] = cntN
     mismatchDic["R"] = cntR
 
+    # print("Mismarching order")
     dfMismatch = pd.DataFrame.from_dict(mismatchDic, orient='index').transpose().rename(columns={"N": "mismatchN", "R": "mismatchR"})
+    # print(dfMismatch)
     return dfMismatch

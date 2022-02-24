@@ -2,7 +2,7 @@ from itertools import groupby
 import pandas as pd
 import operator
 
-def classifyInc(dfIncident,incList):
+def classifyIncErrors(dfIncident,incList):
     allCat = []
     for elem in incList:
         cat = dfIncident.loc[dfIncident["number"] == elem]
