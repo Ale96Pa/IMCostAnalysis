@@ -1,2 +1,0 @@
-listFit=[]
-            oldCat = currCat
