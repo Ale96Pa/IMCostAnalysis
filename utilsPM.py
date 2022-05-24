@@ -2,6 +2,9 @@
 This function returns the only activity name from alignment format
 @param activity="[S/M/L]activity_name"
 """
+from inspect import trace
+
+
 def extractActivtyName(activity):
     return activity.split("]")[1]
 
@@ -32,6 +35,10 @@ def addAllActivities(traceDict):
         traceDict["R"] = 0
     if "C" not in traceDict.keys():
         traceDict["C"] = 0
+    if "D" not in traceDict.keys():
+        traceDict["D"] = 0
+    if "F" not in traceDict.keys():
+        traceDict["F"] = 0
     return traceDict
 
 """

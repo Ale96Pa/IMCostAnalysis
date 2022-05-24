@@ -1,7 +1,9 @@
 fileLog = "data/dummy_log.csv"
 fileModel = "data/base_model.pnml"
 
-dictAlfaMiss = {"N":0.25,"A":0.25, "W":0, "R":0.25,"C":0.25}
+listBaseActivities = ["N","A", "D", "F", "W", "R","C"]
+
+dictAlfaMiss = {"N":0.25,"A":0.25, "D":0.2, "F":0.2, "W":0, "R":0.1,"C":0.1}
 Tmiss = 1
 dictAlfaMult = {"N":0.25,"A":0.25,"W":0.2,"R":0.2,"C":0.1}
 Tmult = 10

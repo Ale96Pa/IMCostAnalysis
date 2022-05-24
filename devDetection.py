@@ -1,4 +1,6 @@
 import utilsPM as upm
+import conf
+
 
 """
 Check if any of the activity is missing in the process, returning a dictionary
@@ -15,6 +17,9 @@ def detectMissing(trace):
 
         if "M" in activity:
             resDict[activityName] = 1
+    for elem in conf.listBaseActivities:
+        if elem not in resDict.keys():
+            resDict[elem] = 1
     return resDict
 
 """
@@ -38,7 +43,7 @@ Check how many times an activity is mismatched, returning a dict of mismatched a
 @return dict = {"activity_1": int}
 """
 def detectMismatch(trace):
-    resDict = {}
+    resDict = {"N":0}
     nextActivities = []
     for elem in trace:
         nextActivities.append(upm.extractActivtyName(elem))
@@ -54,6 +59,6 @@ def detectMismatch(trace):
         elif activityName == "R" and ("N" in nextActivities or "A" in nextActivities or "W" in nextActivities):
             resDict[activityName] += 1
         elif (activityName == "A" or activityName == "W") and ("N" in nextActivities):
-            resDict[activityName] += 1
+            resDict["N"] += 1
 
     return resDict

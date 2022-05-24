@@ -1,12 +1,14 @@
 import conf
 
 def calculateMissing(dfMiss, dictAlfaMiss, Tmiss):
-    if int(dfMiss["N"])+int(dfMiss["A"])+int(dfMiss["R"])+int(dfMiss["C"]) > Tmiss:
+    if int(dfMiss["N"])+int(dfMiss["A"])+int(dfMiss["D"])+int(dfMiss["F"])+int(dfMiss["R"])+int(dfMiss["C"]) > Tmiss:
         tot = 1
     else:
         tot = dictAlfaMiss["N"]*dfMiss["N"]\
         +dictAlfaMiss["A"]*dfMiss["A"]\
         +dictAlfaMiss["W"]*dfMiss["W"]\
+        +dictAlfaMiss["D"]*dfMiss["D"]\
+        +dictAlfaMiss["F"]*dfMiss["F"]\
         +dictAlfaMiss["R"]*dfMiss["R"]\
         +dictAlfaMiss["C"]*dfMiss["C"]
     return tot
