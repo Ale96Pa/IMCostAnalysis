@@ -24,10 +24,10 @@ def barChartFitness(databar):
     plt.title("Fitness distribution")
     plt.show()
 
-def boxPlotFitness(fitnessValues):
+def boxPlotFitness(metricValues, metric):
     plt.figure(figsize = (5, 5))
 
-    bp = plt.boxplot(fitnessValues, patch_artist=True)
+    bp = plt.boxplot(metricValues, patch_artist=True)
     for element in ['whiskers', 'fliers', 'means', 'medians', 'caps']:
         plt.setp(bp[element], color="black")
     for patch in bp['boxes']:
@@ -35,12 +35,12 @@ def boxPlotFitness(fitnessValues):
     
     plt.grid(axis="y", linewidth = 0.5)
 
-    plt.xlabel("Fitness")
+    plt.xlabel(metric)
     plt.xticks(color='w')
 
     plt.yticks(np.arange(0, 1.1, step=0.1))
 
-    plt.title("Fitness distribution")
+    plt.title(metric+" distribution")
     plt.show()
 
 def barChartCost(dfCost):
@@ -98,6 +98,7 @@ def boxPlotCost(dataCost):
 def barChartErrors(databar, error):
     activities = list(databar.keys())
     value = list(databar.values())
+    maxVal = max(value)
     
     if(error == "missing"):
         listColor = [c["n"],c["a"],c["d"],c["f"]]
@@ -113,7 +114,7 @@ def barChartErrors(databar, error):
     for i, v in enumerate(activities):
         plt.text(v, value[i], str(value[i]))
 
-    plt.yticks(np.arange(0, max(value)+10, step=10))
+    plt.yticks(np.arange(0, maxVal+10, step=round(maxVal/10)))
     plt.ylabel("Occurrences")
     
     plt.title("Occurrences of "+error+" error")
@@ -123,6 +124,7 @@ def barChartErrors(databar, error):
 def barChartSeverity(databar):
     sev = list(databar.keys())
     val = list(databar.values())
+    maxVal = max(val)
 
     plt.figure(figsize = (10, 5))
     plt.grid(axis="y", linewidth = 0.5)
@@ -131,7 +133,7 @@ def barChartSeverity(databar):
     for i, v in enumerate(sev):
         plt.text(v, val[i], str(val[i]))
 
-    plt.yticks(np.arange(0, max(val)+10, step=10))
+    plt.yticks(np.arange(0, maxVal+10, step=round(maxVal/10)))
     plt.ylabel("Number of incidents")
     
     plt.title("Error priority")
@@ -174,7 +176,6 @@ def barChartCatgory(dfCat):
     miss =  dfCat['miss'].tolist()
     rep = dfCat['rep'].tolist()
     mism = dfCat['mism'].tolist()
-    print(miss, rep, mism)
     maxVal = max(miss, default=0)+ max(rep, default=0)+ max(mism, default=0)
 
     width = 0.6
@@ -189,7 +190,7 @@ def barChartCatgory(dfCat):
     plt.xticks(rotation=90)
 
     plt.ylabel("Number of errors")
-    plt.yticks(np.arange(0, maxVal+10, step=10))
+    plt.yticks(np.arange(0, maxVal+10, step=round(maxVal/10)))
 
     plt.legend()
 

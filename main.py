@@ -8,6 +8,7 @@ import analysis_charts.charts as charts
 def plotErrorAssessment(alignments):
     # Data for fitness and error assessment
     dataFitness = {}
+    dCost = {}
     dataCost = [[]]
     listMiss = []
     listRep = []
@@ -21,6 +22,7 @@ def plotErrorAssessment(alignments):
 
     for elem in alignments.keys():
         dataFitness[elem] = alignments[elem]["fitness"]
+        dCost[elem] = alignments[elem]["costTotal"]
         listMiss.append(alignments[elem]["costMissing"])
         listRep.append(alignments[elem]["costRepetition"])
         listMism.append(alignments[elem]["costMismatch"])
@@ -52,7 +54,7 @@ def plotErrorAssessment(alignments):
     dfCost = pd.DataFrame(dataCost, columns =['incident', 'fitness', "miss", "rep", "mism"])
     dfCost = dfCost.sort_values(by='fitness', ascending=False)
 
-    return dataFitness, dfCost, {"Missing": listMiss, "Repetition": listRep, "Mismatch": listMism}, \
+    return dataFitness, dCost, dfCost, {"Missing": listMiss, "Repetition": listRep, "Mismatch": listMism}, \
     {"Missing":counterMiss, "Repetition": counterRep, "Mismatch":counterMism}, dictSev
 
 
@@ -98,12 +100,13 @@ if __name__ == "__main__":
     alignments = pm.compute_deviations(aligns, conf.dictAlfaMiss, conf.Tmiss, conf.dictAlfaMult, conf.Tmult, conf.dictAlfaMismatch, conf.Tmism, conf.dictAlfaCost)
     incByCat = id.formatIncidents(conf.fileLog)
 
-    dataFitness, dfCost, dictError, counterError, dictSev = plotErrorAssessment(alignments)
+    dataFitness, dCost, dfCost, dictError, counterError, dictSev = plotErrorAssessment(alignments)
     dfCategory, boxDataFitness, boxDataCost = plotIncidentAssessment(alignments, incByCat)
 
     # Plot charts for fitness and cost assessment
     charts.barChartFitness(dataFitness)
-    charts.boxPlotFitness(list(dataFitness.values()))
+    charts.boxPlotFitness(list(dataFitness.values()), "Fitness")
+    charts.boxPlotFitness(list(dCost.values()), "Cost")
 
     charts.barChartCost(dfCost)
     charts.boxPlotCost(dictError)
