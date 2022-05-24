@@ -1,6 +1,5 @@
-import utilsPM as upm
+import utils.utilsPM as upm
 import conf
-
 
 """
 Check if any of the activity is missing in the process, returning a dictionary

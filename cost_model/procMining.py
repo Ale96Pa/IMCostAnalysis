@@ -5,9 +5,9 @@ from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.petri_net.importer import importer as pnml_importer
 from pm4py.algo.conformance.alignments.petri_net import algorithm as alignments
 
-import devDetection as dd
-import costModel as cm
-import utilsPM as upm
+import cost_model.devDetection as dd
+import cost_model.costModel as cm
+import utils.utilsPM as upm
 
 
 """
@@ -46,10 +46,7 @@ def compute_trace_alignment(inputFile, modelFile):
         resAlignments.append({
             "incident_id": log[i].__getitem__(0)["incident_id"],
             "alignment": traceFormat,
-            "fitness": trace["fitness"]#,
-            # "cost": trace["cost"],
-            # "visited_states": trace["visited_states"],
-            # "traversed_arcs": trace["traversed_arcs"]
+            "fitness": trace["fitness"]
         })
         i+=1
     return resAlignments
@@ -75,9 +72,6 @@ def compute_deviations(traces, dictAlfaMiss, Tmiss, dictAlfaMult, Tmult, dictAlf
         deviationsDict[elem["incident_id"]] = {
             "alignment": elem["alignment"],
             "fitness": elem["fitness"],
-            # "cost": elem["cost"],
-            # "visited_states": elem["visited_states"],
-            # "traversed_arcs": elem["traversed_arcs"],
             "missing": resMissing,
             "repetition": resRepetition,
             "mismatch": resMismatch,

@@ -2,9 +2,6 @@
 This function returns the only activity name from alignment format
 @param activity="[S/M/L]activity_name"
 """
-from inspect import trace
-
-
 def extractActivtyName(activity):
     return activity.split("]")[1]
 
