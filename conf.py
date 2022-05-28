@@ -1,5 +1,5 @@
-fileLog = "data/enriched_log.csv"
-fileModel = "data/simple_model.pnml"
+fileLog = "data/dummy_log.csv"
+fileModel = "data/dummy_model.pnml"
 
 listBaseActivities = ["N","A", "D", "F", "W", "R","C"]
 
